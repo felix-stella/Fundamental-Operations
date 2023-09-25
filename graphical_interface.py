@@ -109,4 +109,5 @@ class MathQuizApp:
 if __name__ == "__main__":
     root = tk.Tk()  # 创建Tkinter窗口
     app = MathQuizApp(root)  # 创建应用程序对象
-    root.mainloop()  # 进入主事件循环，启动应用程序
+    # 进入主事件循环，启动应用程序
+    root.mainloop()
