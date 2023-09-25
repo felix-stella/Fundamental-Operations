@@ -1,6 +1,5 @@
 import random
 import math
-from webbrowser import Opera
 
 class Number:
     '''Generate proper fractions, whole numbers, mixed fractions.
