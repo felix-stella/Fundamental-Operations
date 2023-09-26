@@ -73,12 +73,12 @@ class Expression:
             ntype_2=random.randint(1,3)
             num_2=Number(ntype_2,self.max)
             if operator=='/':
-                subexpression=num_1.generate_string()+operator+num_2.generate_string
+                subexpression=num_1.generate_string()+operator+num_2.generate_string()
             else:
                 if num_1.get_value()>num_2.get_value():
-                    subexpression=num_1.generate_string()+operator+num_2.generate_string
+                    subexpression=num_1.generate_string()+operator+num_2.generate_string()
                 else:
-                    subexpression=num_2.generate_string()+operator+num_1.generate_string
+                    subexpression=num_2.generate_string()+operator+num_1.generate_string()
             return subexpression,self.caculate_subexpression(num_1.get_value(),operator,num_2.get_value())
         elif etype==2:
             if operator=='-':
@@ -110,7 +110,7 @@ class Expression:
                 subexpression_3,value_3=self.generate_subexpression(etype_3)
             else:
                 etype_3=2
-                subexpression_3,value_3=self.generate_subexpression
+                subexpression_3,value_3=self.generate_subexpression(etype_3,value_2)
                 (etype_2,self.caculate_subexpression(value_1,subexpression_2[0],value_2))
 
             if etype_3==3:
@@ -140,10 +140,12 @@ class Expression:
                         expression_list.append(subexpression_1)
                         expression_list.append(subexpression_3)
             else:
-                    expression_list.append(subexpression_2)
                     expression_list.append(subexpression_1)
+                    expression_list.append(subexpression_2)
                     expression_list.append(subexpression_3)
                     generated=1
         return expression_list
 
-
+a=Expression(10,1)
+t=a.generate_expression_list()
+print(t)
