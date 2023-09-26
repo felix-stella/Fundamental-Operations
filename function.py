@@ -95,13 +95,13 @@ class Expression:
             return subexpression,self.caculate_subexpression(num_1.get_value(),operator,num_2.get_value())
         elif etype==2:
             if operator=='-':
-                n_max=math.floor(previous_value)
-                if n_max<1:
-                    print(previous_value)
-                num=Number(random.randint(1,3),n_max)
+                num=Number(random.randint(1,3),self.max)
                 subexpression=operator+num.generate_string()
             elif operator=='%':
-                num=Number(random.randint(1,3),self.max,1)
+                num_value=0
+                while(num_value==0):
+                    num=Number(random.randint(1,3),self.max)
+                    num_value
                 subexpression=operator+num.generate_string()
             else:
                 num=Number(random.randint(1,3),self.max)
