@@ -1,6 +1,9 @@
 import tkinter as tk
-import function
+from function import *
 
+# 声明为全局变量
+global num_questions
+global max_value
 
 class MathQuizApp:
     def __init__(self, root):
@@ -50,12 +53,14 @@ class MathQuizApp:
         self.results_text.pack()
 
     def generate_questions(self):
-        # 获取题目数量和最大值输入
+        # 获取题目数量和最大值输入并存储为全局变量
+        global num_questions
+        global max_value
         num_questions = int(self.num_questions_entry.get())
         max_value = int(self.max_value_entry.get())
 
-        # 调用function.py中的generate_questions函数生成题目和答案
-        questions, answers = function.generate_questions(num_questions, max_value)
+        # 调用 function.py 中的函数生成题目
+        questions, answers = function.generate_questions()
 
         # 清空题目和答案文本框
         self.questions_text.delete(1.0, tk.END)
@@ -84,9 +89,8 @@ class MathQuizApp:
 
         # 清空答题结果文本框，并显示结果
         self.results_text.delete(1.0, tk.END)
-        self.results_text.insert(tk.END, f"正确: {', '.join(map(str, correct))}\n")
-        self.results_text.insert(tk.END, f"错误: {', '.join(map(str, incorrect))}\n")
-
+        self.results_text.insert(tk.END, f"正确题号: {', '.join(map(str, correct))}\n")
+        self.results_text.insert(tk.END, f"错误题号: {', '.join(map(str, incorrect))}\n")
 
 if __name__ == "__main__":
     root = tk.Tk()
