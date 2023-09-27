@@ -62,6 +62,9 @@ class Number:
         denominator=self.denominator/gcd
         integer=numerator//denominator+self.integer
         numerator=numerator%denominator
+        if numerator==denominator:
+            numerator=0
+            integer+=1
         self.integer=int(integer)
         self.numerator=int(numerator)
         self.denominator=int(denominator)
