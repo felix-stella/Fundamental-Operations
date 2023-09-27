@@ -1,14 +1,13 @@
 import tkinter as tk
 from function import *
 
-# 声明为全局变量
-global num_questions
-global max_value
-
 class MathQuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("数学题目生成器")
+
+        self.questions = []
+        self.answers = []
 
         # 创建题目数量输入框和标签
         self.num_questions_label = tk.Label(root, text="题目数量:")
@@ -60,28 +59,27 @@ class MathQuizApp:
         max_value = int(self.max_value_entry.get())
 
         # 调用 function.py 中的函数生成题目
-        questions = function.generate_questions()
+        exp = Expression(max_value, num_questions)
+        self.questions, self.answers = exp.run()
 
         # 清空题目和答案文本框
         self.questions_text.delete(1.0, tk.END)
         self.answers_text.delete(1.0, tk.END)
 
-        # 在界面上显示题目和答案，并标注序号
-        for i, (question, answer) in enumerate(zip(questions, answers), start=1):
+        # 在界面上显示题目，并标注序号
+        for i, question in enumerate(self.questions, start=1):
             self.questions_text.insert(tk.END, f"{i}. {question}\n")
-            self.answers_text.insert(tk.END, f"{i}. {answer}\n")
 
     def check_answers(self):
-        # 获取用户输入的答案，并从function.py中获取正确答案
+        # 获取用户输入的答案
         user_answers = self.answers_text.get(1.0, tk.END).splitlines()
-        correct_answers = function.get_answers()
 
         # 初始化正确和错误答案列表
         correct = []
         incorrect = []
 
         # 比较用户答案和正确答案，并记录结果
-        for i, (user_answer, correct_answer) in enumerate(zip(user_answers, correct_answers), start=1):
+        for i, (user_answer, correct_answer) in enumerate(zip(user_answers, self.answers), start=1):
             if user_answer.strip() == correct_answer.strip():
                 correct.append(i)
             else:
@@ -92,7 +90,3 @@ class MathQuizApp:
         self.results_text.insert(tk.END, f"正确题号: {', '.join(map(str, correct))}\n")
         self.results_text.insert(tk.END, f"错误题号: {', '.join(map(str, incorrect))}\n")
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = MathQuizApp(root)
-    root.mainloop()
