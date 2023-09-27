@@ -70,6 +70,16 @@ class MathQuizApp:
         for i, question in enumerate(self.questions, start=1):
             self.questions_text.insert(tk.END, f"{i}. {question}\n")
 
+        # 将正确答案保存到文件 "answer.txt"
+        with open("answer.txt", "w") as answer_file:
+            for answer in self.answers:
+                answer_file.write(answer + "\n")
+
+        # 将问题保存到文件 "question.txt"
+        with open("question.txt", "w") as question_file:
+            for question in self.questions:
+                question_file.write(question + "\n")
+
     def check_answers(self):
         # 获取用户输入的答案
         user_answers = self.answers_text.get(1.0, tk.END).splitlines()
@@ -90,3 +100,7 @@ class MathQuizApp:
         self.results_text.insert(tk.END, f"正确题号: {', '.join(map(str, correct))}\n")
         self.results_text.insert(tk.END, f"错误题号: {', '.join(map(str, incorrect))}\n")
 
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = MathQuizApp(root)
+    root.mainloop()
