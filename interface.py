@@ -60,7 +60,7 @@ class MathQuizApp:
         max_value = int(self.max_value_entry.get())
 
         # 调用 function.py 中的函数生成题目
-        questions, answers = function.generate_questions()
+        questions = function.generate_questions()
 
         # 清空题目和答案文本框
         self.questions_text.delete(1.0, tk.END)
