@@ -3,8 +3,8 @@ import math
 from unittest import result
 
 #def replace_characters(input_string):
-#    # Replace * with ¡Á and % with ¡Â using the replace method
-#    modified_string = input_string.replace('*', '¡Á').replace('%', '¡Â')
+#    # Replace * with ?? and % with ?? using the replace method
+#    modified_string = input_string.replace('*', '??').replace('%', '??')
 #    return modified_string
 
 class Number:
