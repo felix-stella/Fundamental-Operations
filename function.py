@@ -446,5 +446,3 @@ class Expression:
         self.randomly_generate_questions()
         return self.questions,self.answers
 
-
-
