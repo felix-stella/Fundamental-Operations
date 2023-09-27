@@ -381,7 +381,7 @@ class Expression:
         return self.questions,self.answers
 
 
-exp=Expression(5,10000)
+exp=Expression(5,100)
 questions,answers=exp.run()
 with open('./question', "w") as file:
     for question in questions:
