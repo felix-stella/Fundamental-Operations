@@ -1,10 +1,16 @@
 import random
 import math
+from unittest import result
+
+#def replace_characters(input_string):
+#    # Replace * with ¡Á and % with ¡Â using the replace method
+#    modified_string = input_string.replace('*', '¡Á').replace('%', '¡Â')
+#    return modified_string
 
 class Number:
     '''Generate number'''
 
-    def __init__(self,max=None,nums=None):
+    def __init__(self,max:int=None,nums:tuple=None):
         if nums:
             if isinstance(nums, tuple) and len(nums) == 3:
                 if nums[2]==0:
@@ -25,8 +31,17 @@ class Number:
                 self.numerator=random.randint(1,self.denominator)
             else:
                 self.numerator=0
+    def reduce_fraction(self):
+        gcd = math.gcd(self.numerator, self.denominator)
+        numerator=self.numerator/gcd
+        denominator=self.denominator/gcd
+        integer=numerator//denominator+self.integer
+        numerator=numerator%denominator
+        self.integer=int(integer)
+        self.numerator=int(numerator)
+        self.denominator=int(denominator)
 
-    def generate_string(self):
+    def __str__(self):
         if self.integer==0:
             if self.numerator:
                 return str(self.numerator)+'/'+str(self.denominator)
@@ -38,13 +53,13 @@ class Number:
             else:
                 return str(self.integer)
 
-    def get_value(self):
+    def __float__(self):
         return self.integer+self.numerator/self.denominator
 
 class Fraction:
     '''Process fraction'''
 
-    def __init__(self,f1,f2=None,op=None):
+    def __init__(self,f1:Number,f2:Number=None,op:str=None):
         if isinstance(f1,Number):
             self.f1=f1
         else:
@@ -58,20 +73,13 @@ class Fraction:
             else:
                 raise ValueError("The parameters must be of the Number type.")
 
-    def reduce_fraction(self,f):
+    def reduce_fraction(self,f:Number):
         if isinstance(f,Number):
             gcd = math.gcd(f.numerator, f.denominator)
             numerator=f.numerator/gcd
             denominator=f.denominator/gcd
-            integer=f.integer
-            if numerator>=0:
-                if(numerator>=denominator):
-                    integer=numerator//denominator+f.integer
-                    numerator=numerator%denominator
-            else:
-                if(-numerator>=denominator):
-                    integer=-((-numerator)//denominator)
-                    numerator=-((-numerator)%denominator)
+            integer=numerator//denominator+f.integer
+            numerator=numerator%denominator
             result=Number(nums=(integer,numerator,denominator))
         else:
             raise ValueError("The parameters must be of the Number type.")
@@ -102,7 +110,7 @@ class Fraction:
 
         else:
             result=self.f1
-        result=self.reduce_fraction(result)
+        result.reduce_fraction()
         return result
 
 
@@ -114,6 +122,10 @@ class Expression:
         self.question_num=question_num
         self.expressions=set()
         self.expression_lists=[]
+        self.generation_times=0
+        self.answers=[]
+        self.questions=[]
+        self.expression_num=0
 
     def caculate_subexpression(self,num_1,operator,num_2):
         if operator=='+':
@@ -125,233 +137,246 @@ class Expression:
         else:
             return num_1/num_2
 
-    def generate_subexpression(self,etype,min_value=-1):
-        operator=random.choice(['+','-','*','%'])
+    def generate_subexpression(self,etype,op):
         if etype==1:
-            ntype_1=random.randint(1,3)
-            num_1=Number(ntype_1,self.max)
-            ntype_2=random.randint(1,3)
-            num_2=Number(ntype_2,self.max)
-            if operator=='%':
-                num_value=0
-                while(num_2.get_value==0):
-                    num_2=Number(ntype_2,self.max)
-                    num_value=num.get_value()
-                if min_value>=0:
-                    num_1=Number(ntype_1,self.max,math.ceil(num_value*min_value))
-                subexpression=num_1.generate_string()+operator+num_2.generate_string()
-            elif operator=='-':
-                if min_value>=0:
-                    num_1=Number(ntype_1,self.min_value)
-                    subexpression=num_1.generate_string()+operator+num_2.generate_string()
+            num_1=Number(self.max)
+            num_1.reduce_fraction()
+            num_2=Number(self.max)
+            num_2.reduce_fraction()
+            if op !='%':
+                if float(num_1)>=float(num_2):
+                    subexpression=[num_1,op,num_2]
                 else:
-                    if num_1.get_value()>num_2.get_value():
-                        subexpression=num_1.generate_string()+operator+num_2.generate_string()
-                    else:
-                        subexpression=num_2.generate_string()+operator+num_1.generate_string()
-            elif operator=='*':
-                if min_value>0:
-                    num_value=0
-                    while(num_2.get_value==0):
-                        num_2=Number(ntype_2,self.max)
-                        num_value=num.get_value()
-                    num_1=Number(ntype_1,self.max,math.ceil(min_value/num_value))
-                if num_1.get_value()>num_2.get_value():
-                    subexpression=num_1.generate_string()+operator+num_2.generate_string()
-                else:
-                    subexpression=num_2.generate_string()+operator+num_1.generate_string()
+                    subexpression=[num_2,op,num_1]
             else:
-                if min_value>0:
-                    num_1=Number(ntype_1,self.max,math.ceil(min_value-num_value))
-                if num_1.get_value()>num_2.get_value():
-                    subexpression=num_1.generate_string()+operator+num_2.generate_string()
+                subexpression=[num_1,op,num_2]
+        else :
+            if op in ['-','%']:
+                if random.randint(0,1):
+                    subexpression=[op,Number(self.max)]
                 else:
-                    subexpression=num_2.generate_string()+operator+num_1.generate_string()
-            return subexpression,self.caculate_subexpression(num_1.get_value(),operator,num_2.get_value())
-        elif etype==2:
-            if operator=='%':
-                num_value=0
-                while(num_value==0):
-                    num=Number(random.randint(1,3),self.max)
-                    num_value=num.get_value()
-                subexpression=operator+num.generate_string()
+                    subexpression=[Number(self.max),op]
             else:
-                num=Number(random.randint(1,3),self.max)
-                subexpression=operator+num.generate_string()
-            return subexpression,num.get_value()
-        else:
-            subexpression=operator
-            return subexpression,-1
+                subexpression=[op,Number(self.max)]
+        return subexpression
 
     def generate_expression_list(self):
-        generated=0
-        while(not generated):
-            expression_list=[]
-            sub_num=random.randint(1,3)
-            if sub_num==1:
-                etype_1=1
-                subexpression_1,value_1=self.generate_subexpression(etype_1)
-                expression_list.append(subexpression_1)
-                generated=1
-            elif sub_num==2:
-                etype_2=2
-                subexpression_1,value_1=self.generate_subexpression(etype_1)
-                if subexpression_1[0]=='-':
-                    min_value=value_1
+        expression_list=[]
+        sub_num=random.randint(1,3)
+        operators=[random.choice(['+','-','*','%']) for _ in range(sub_num)]
+        subexpression_1=self.generate_subexpression(1,operators[0])
+        str_sub_1=str(subexpression_1[0])+subexpression_1[1]+str(subexpression_1[2])
+        if sub_num==1:
+            expression_list.append(subexpression_1)
+            str_sub_2=''
+            str_sub_3=''
+            string=str_sub_1+'|'+str_sub_2+'|'+str_sub_3
+        elif sub_num==2:
+            subexpression_2=self.generate_subexpression(2,operators[1])
+            str_sub_2=str(subexpression_2[0])+str(subexpression_2[1])
+            str_sub_3=''
+            expression_list.append(subexpression_1)
+            expression_list.append(subexpression_2)
+            string=str_sub_1+'|'+str_sub_2+'|'+str_sub_3
+        else :
+            etype=random.randint(1,2)
+            subexpression_2=self.generate_subexpression(etype,operators[1])
+            if etype==1:
+                subexpression_3=[operators[2]]
+                str_sub_2=str(subexpression_2[0])+str(subexpression_2[1])+str(subexpression_2[2])
+                str_sub_3=subexpression_3[0]
+                if str_sub_1>=str_sub_2 and operators[2] in ['+','*']:
+                    expression_list.append(subexpression_1)
+                    expression_list.append(subexpression_2)  
+                    expression_list.append(subexpression_3)
+                    string=str_sub_1+'|'+str_sub_2+'|'+str_sub_3
                 else:
-                    min_value=-1
-                etype_2=1
-                subexpression_2,value_2=self.generate_subexpression(etype_2,min_value)
+                    expression_list.append(subexpression_2)
+                    expression_list.append(subexpression_1)  
+                    expression_list.append(subexpression_3)
+                    string=str_sub_1+'|'+str_sub_2+'|'+str_sub_3
+            else:
+                subexpression_3=self.generate_subexpression(2,operators[2])
+                str_sub_2=str(subexpression_2[0])+str(subexpression_2[1])
+                str_sub_3=str(subexpression_3[0])+str(subexpression_3[1])
                 expression_list.append(subexpression_1)
-                expression_list.append(subexpression_2)
-                generated=1
-            else:
-                etype_3=random.randint(2,3)
-                subexpression_3,value_3=self.generate_subexpression(etype_3)
-                if(etype_3==3):
-                    etype_2=1
-                    etype_1=1
-                    if subexpression_3=='%':
-                        subexpression_2,value_2=self.generate_subexpression(etype_2)
-                        while(value_2==0):
-                            subexpression_2,value_2=self.generate_subexpression(etype_2)
-                    if subexpression_3=='-':
-                        subexpression_1,value_1=self.generate_subexpression(etype_1,value_2)
-                else:
-                    etype_2=2
-                    etype_1=1
-                    subexpression_2,value_2=self.generate_subexpression(etype_2)
-                    if subexpression_3[0]=='-':
-                        if subexpression_2[0]=='+':
-                            subexpression_1,value_1=self.generate_subexpression(etype_1,value_2)
-        #        if etype_2==1:
-        #            etype_3=3
-        #            subexpression_3,value_3=self.generate_subexpression(etype_3)
-        #        else:
-        #            etype_3=2
-        #            subexpression_3,value_3=self.generate_subexpression(etype_3,value_2)
-        #            (etype_2,self.caculate_subexpression(value_1,subexpression_2[0],value_2))
+                expression_list.append(subexpression_2)  
+                expression_list.append(subexpression_3)
+                string=str_sub_1+'|'+str_sub_2+'|'+str_sub_3
+        return expression_list,string
 
-        #        if etype_3==3:
-        #            if subexpression_3=='-':
-        #                if(value_1<value_2):
-        #                    generated=0
-        #                else:
-        #                    expression_list.append(subexpression_1)
-        #                    expression_list.append(subexpression_2)
-        #                    expression_list.append(subexpression_3)
-        #                    generated=1
-        #            elif subexpression_3=='%':
-        #                if value_2==0:
-        #                    generated=0
-        #                else:
-        #                    expression_list.append(subexpression_1)
-        #                    expression_list.append(subexpression_2)
-        #                    expression_list.append(subexpression_3)
-        #                    generated=1
-        #            else:
-        #                if subexpression_1>subexpression_2:
-        #                    expression_list.append(subexpression_1)
-        #                    expression_list.append(subexpression_2)
-        #                    expression_list.append(subexpression_3)
-        #                else:
-        #                    expression_list.append(subexpression_2)
-        #                    expression_list.append(subexpression_1)
-        #                    expression_list.append(subexpression_3)
-        #        else:
-        #                expression_list.append(subexpression_1)
-        #                expression_list.append(subexpression_2)
-        #                expression_list.append(subexpression_3)
-        #                generated=1
-        #expression_string=','.join(expression_list)
-        #if expression_string not in self.expressions:
-        #    self.expressions.add(expression_string)
-        #    self.expression_lists.append(expression_list)
-        #return expression_list
-    
-    def generate_questions_set(self):
-        while(len(self.expressions)<self.question_num):
-            self.generate_expression_list()
-
-    def process_string(self,string):
-        operators=['+','-','*','%']
-        num_1=''
-        num_2=''
-        operator=''
-        if string[0] in operators:
-            operator=string[0]
-            num_1=''
-            num_2=string[1:]
-            etype=2
-        elif string[-1] in operators:
-            operator=string[-1]
-            num_1=string[:-1]
-            num_2=''
-            etype=3
-        else:
-            etype=1
-            for op in operators:
-                index = string.find(op)
-                if index != -1:
-                    operator = string[index]
-                    num_1=string[index]
-                    num_2=string[index+1:]
-                    break
-        return etype,[num_1,operator,num_2]
-
-    def process_fraction(self,num):
-        fra_bar_index=num.find('/')
-        if fra_bar_index !=-1:
-            denominator=int(num[fra_bar_index+1:])
-            delimiter_index=num.find('\'')
-            if delimiter_index !=-1:
-                integer=int(num[:delimiter_index])
-                numerator=int(num[delimiter_index+1:fra_bar_index])+integer*denominator
-            else:
-                numerator=int(num[:delimiter_index])
-        else:
-            denominator=1
-            numerator=int(num)
-        
-        return [numerator,denominator]
-    def caculate_frations(self,num_1,operator,num_2):
-        if operator=='+':
-            numerator=num_1[0]*num_2[1]+num_2[0]*num_1[1]
-            denominator=num_1[1]*num_2[1]
-        elif operator=='-':
-            numerator=num_1[0]*num_2[1]-num_2[0]*num_1[1]
-            denominator=num_1[1]*num_2[1]
-        elif operator=='*':
-            numerator=num_1[0]*num_2[0]
-            denominator=num_1[1]*num_2[1]
-        else:
-            numerator=num_1[0]*num_2[1]
-            denominator=num_1[1]*num_2[0]
-        return [numerator,denominator]
-    
     def caculate_answer(self,expression_list):
-        answer=[]
-        for subexp in expression_list:
-            processed_subexp=self.process_string(subexp)
-            if processed_subexp[0]:
-                num_1=self.process_fraction(processed_subexp[0])
-                num_2=self.process_fraction(processed_subexp[2])
-                answer.append(self.caculate_frations(num_1,processed_subexp[1],num_2))
-            elif processed_subexp[2]!='':
-                num_2=self.process_fraction(processed_subexp[2])
-                answer.append(self.caculate_frations(answer[-1],processed_subexp[1],num_2))
+        expression_1=Fraction(expression_list[0][0],expression_list[0][2],expression_list[0][1])
+        result_1=expression_1.caculate_fractions()
+        if float(result_1)<0:
+            raise ValueError("Sub expression cannot be less than zero.")
+        if len(expression_list)==1:
+            result=result_1
+        elif len(expression_list)==2:
+            if isinstance(expression_list[1][0],str):
+                expression_2=Fraction(result_1,expression_list[1][1],expression_list[1][0])
             else:
-                answer.append(self.caculate_frations(answer[-2],processed_subexp[1],answer[-1]))
-        return answer[-1]
+                expression_2=Fraction(expression_list[1][0],result_1,expression_list[1][1])
+            result=expression_2.caculate_fractions()
+        else:
+            if len(expression_list[2])==1:
+                expression_2=Fraction(expression_list[1][0],expression_list[1][2],expression_list[1][1])
+                result_2=expression_2.caculate_fractions()
+                if float(result_2)<0:
+                    raise ValueError("Sub expression cannot be less than zero.")
+                expression_3=Fraction(result_1,result_2,expression_list[2][0])
+                result=expression_3.caculate_fractions()
+            else:
+                if isinstance(expression_list[1][0],str):
+                    expression_2=Fraction(result_1,expression_list[1][1],expression_list[1][0])
+                else:
+                    expression_2=Fraction(expression_list[1][0],result_1,expression_list[1][1])
+                result_2=expression_2.caculate_fractions()
+                if float(result_2)<0:
+                    raise ValueError("Sub expression cannot be less than zero.")
+                if isinstance(expression_list[2][0],str):
+                    expression_2=Fraction(result_2,expression_list[2][1],expression_list[2][0])
+                else:
+                    expression_2=Fraction(expression_list[2][0],result_2,expression_list[2][1])
+                result=expression_2.caculate_fractions()
+        if float(result)<0:
+            raise ValueError("Sub expression cannot be less than zero.")
+        return result
 
-#for i in range(1000):
-#    a=Expression(10,1)
-#    t=a.generate_expression_list()
-#    print(t)
+    def generate_expressions(self):
+        while(self.expression_num<self.question_num):
+            self.generation_times+=1
+            try:
+                exp_list,exp_string=self.generate_expression_list()
+                answer=self.caculate_answer(exp_list)
+            except ValueError as e:
+                continue
+            self.expressions.add(exp_string)
+            self.expression_lists.append(exp_list)
+            self.answers.append(str(answer))
+            self.expression_num+=1
 
-a=Number(nums=(0,1,3))
-b=Number(nums=(0,9,2))
-c=Fraction(a,b,'-')
-result=c.caculate_fractions()
-print(result.generate_string())
-print(result.get_value())
+    def randomly_generate_questions(self):
+        for expression in self.expression_lists:
+            op_1=expression[0][1]
+            if expression[0][1] in ['+','*']:
+                if random.randint(0,1):
+                    question_1=str(expression[0][0])+str(expression[0][1])+str(expression[0][2])
+                else:
+                    question_1=str(expression[0][2])+str(expression[0][1])+str(expression[0][0])
+            else:
+                question_1=str(expression[0][0])+str(expression[0][1])+str(expression[0][2])
+            if len(expression)>=2 :
+                if len(expression[1])==2:
+                    if str(expression[1][0])=='+':
+                        op_2='+'
+                        if random.randint(0,1):
+                            question_2=question_1+op_2+str(expression[1][1])
+                        else:
+                            if expression[0][1] in ['+','-']:
+                                question_2=str(expression[1][1])+op_2+'('+question_1+')'
+                            else:
+                                question_2=str(expression[1][1])+op_2+question_1
+                    elif str(expression[1][0])=='*':
+                        op_2='*'
+                        if random.randint(0,1):
+                            if str(expression[0][1]) in ['*','%']:
+                               question_2=question_1+op_2+str(expression[1][1])
+                            else:
+                                question_2='('+question_1+')'+op_2+str(expression[1][1])
+                        else:
+                            question_2=str(expression[1][1])+op_2+'('+question_1+')'
+                    elif str(expression[1][0])=='-':
+                        op_2='-'
+                        question_2=question_1+op_2+str(expression[1][1])
+                    elif str(expression[1][0])=='%':
+                        op_2='%'
+                        if str(expression[0][1]) in ['*','%']: 
+                            question_2=question_1+op_2+str(expression[1][1])
+                        else:
+                            question_2='('+question_1+')'+op_2+str(expression[1][1])
+                    elif str(expression[1][1])=='-':
+                        op_2='-'
+                        if str(expression[0][1]) in ['*','%']: 
+                            question_2=str(expression[1][0])+op_2+question_1
+                        else:
+                            question_2=str(expression[1][0])+op_2+'('+question_1+')'
+                    else:
+                        op_2='%'
+                        question_2=str(expression[1][0])+op_2+'('+question_1+')'
+                    if len(expression)>2:
+                        if expression[2][0]=='+':
+                            op_3='+'
+                            if random.randint(0,1):
+                                question_3=question_2+op_3+str(expression[2][1])
+                            else:
+                                if op_1 in ['+','-'] and op_2 in ['+','-']:
+                                    question_3=str(expression[2][1])+op_3+'('+question_2+')'
+                                else:
+                                    question_3=str(expression[2][1])+op_3+question_2
+                        elif expression[2][0]=='-':
+                            op_3='-'
+                            question_3=question_2+op_3+str(expression[2][1])
+                        elif expression[2][0]=='*':
+                            op_3='*'
+                            if random.randint(0,1):
+                                question_3=str(expression[2][1])+op_3+'('+question_2+')'
+                            else:
+                                if op_2 in ['*','%']:
+                                    question_3=question_2+op_3+str(expression[2][1])
+                                else:
+                                    question_3='('+question_2+')'+op_3+str(expression[2][1])
+                        elif expression[2][0]=='%':
+                            op_3='%'
+                            if op_2 in ['*','%']:
+                                question_3=question_2+op_3+str(expression[2][1])
+                            else:
+                                question_3='('+question_2+')'+op_3+str(expression[2][1])
+                        elif expression[2][1]=='-':
+                            op_3='-'
+                            if op_2 in ['*','%']:
+                                question_3=str(expression[2][0])+op_3+question_2
+                            else:
+                                question_3=str(expression[2][0])+op_3+'('+question_2+')'
+                        elif expression[2][1]=='%':
+                            op_3='%'
+                            question_3=str(expression[2][0])+op_3+'('+question_2+')'
+                else:
+                    question_1='('+question_1+')'
+                    question_2='('+str(expression[1][0])+str(expression[1][1])+str(expression[1][2])+')'
+                    if str(expression[2][0]) in ['+','*']:
+                        if random.randint(0,1):
+                            question_3=question_1+str(expression[2][0])+question_2
+                        else:
+                            question_3=question_2+str(expression[2][0])+question_1
+                    else:
+                        question_3=question_2+str(expression[2][0])+question_1
+            #if len(expression)==1:
+            #    question=replace_characters(question_1)
+            #elif len(expression)==2:
+            #    question=replace_characters(question_2)
+            #else:
+            #    question=replace_characters(question_3)
+            #self.questions.append(question)
+            if len(expression)==1:
+                self.questions.append(question_1)
+            elif len(expression)==2:
+                self.questions.append(question_2)
+            else:
+                self.questions.append(question_3)
+
+
+    def run(self):
+        self.generate_expressions()
+        self.randomly_generate_questions()
+        return self.questions,self.answers
+
+
+exp=Expression(10,100)
+questions,answers=exp.run()
+with open('./question', "w") as file:
+    for question in questions:
+        file.write(question + "\n")
+with open('./answer', "w") as file:
+    for answer in answers:
+        file.write(answer + "\n")
