@@ -41,6 +41,7 @@ class Number:
         self.numerator=int(numerator)
         self.denominator=int(denominator)
 
+
     def __str__(self):
         if self.integer==0:
             if self.numerator:
@@ -73,17 +74,17 @@ class Fraction:
             else:
                 raise ValueError("The parameters must be of the Number type.")
 
-    def reduce_fraction(self,f:Number):
-        if isinstance(f,Number):
-            gcd = math.gcd(f.numerator, f.denominator)
-            numerator=f.numerator/gcd
-            denominator=f.denominator/gcd
-            integer=numerator//denominator+f.integer
-            numerator=numerator%denominator
-            result=Number(nums=(integer,numerator,denominator))
-        else:
-            raise ValueError("The parameters must be of the Number type.")
-        return result
+    #def reduce_fraction(self,f:Number):
+    #    if isinstance(f,Number):
+    #        gcd = math.gcd(f.numerator, f.denominator)
+    #        numerator=f.numerator/gcd
+    #        denominator=f.denominator/gcd
+    #        integer=numerator//denominator+f.integer
+    #        numerator=numerator%denominator
+    #        result=Number(nums=(integer,numerator,denominator))
+    #    else:
+    #        raise ValueError("The parameters must be of the Number type.")
+    #    return result
     
     def caculate_fractions(self):
         if self.f2:
@@ -104,6 +105,8 @@ class Fraction:
                           *(self.f2.numerator+self.f2.integer*self.f2.denominator)
                 result=Number(nums=(0,numerator,denominator))
             elif self.op=='%':
+                if float(self.f2)==0:
+                    raise ValueError("The divisor cannot be 0.")
                 denominator=self.f1.denominator*(self.f2.numerator+self.f2.integer*self.f2.denominator)
                 numerator=(self.f1.numerator+self.f1.integer*self.f1.denominator)*self.f2.denominator
                 result=Number(nums=(0,numerator,denominator))
@@ -153,11 +156,17 @@ class Expression:
         else :
             if op in ['-','%']:
                 if random.randint(0,1):
-                    subexpression=[op,Number(self.max)]
+                    num=Number(self.max)
+                    num.reduce_fraction()
+                    subexpression=[op,num]
                 else:
-                    subexpression=[Number(self.max),op]
+                    num=Number(self.max)
+                    num.reduce_fraction()
+                    subexpression=[num,op]
             else:
-                subexpression=[op,Number(self.max)]
+                num=Number(self.max)
+                num.reduce_fraction()
+                subexpression=[op,num]
         return subexpression
 
     def generate_expression_list(self):
@@ -372,7 +381,7 @@ class Expression:
         return self.questions,self.answers
 
 
-exp=Expression(10,100)
+exp=Expression(5,10000)
 questions,answers=exp.run()
 with open('./question', "w") as file:
     for question in questions:
