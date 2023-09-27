@@ -55,9 +55,9 @@ class Number:
             else:
                 self.numerator=0
     def reduce_fraction(self):
-        '''Calculate the greatest common divisor (GCD).'''
-
-        gcd = math.gcd(self.numerator, self.denominator)
+        #reduce_fraction
+        
+        gcd = math.gcd(self.numerator, self.denominator)#Calculate the greatest common divisor (GCD).
         numerator=self.numerator/gcd
         denominator=self.denominator/gcd
         integer=numerator//denominator+self.integer
