@@ -31,13 +31,10 @@ class MathQuizApp:
         # 创建题目和答案显示区域
         self.questions_label = tk.Label(root, text="题目:")
         self.questions_label.pack()
-
         self.questions_text = tk.Text(root, height=10, width=40)
         self.questions_text.pack()
-
         self.answers_label = tk.Label(root, text="答案:")
         self.answers_label.pack()
-
         self.answers_text = tk.Text(root, height=10, width=40)
         self.answers_text.pack()
 
