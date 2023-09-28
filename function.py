@@ -46,7 +46,7 @@ class Number:
                 raise ValueError("nums must be a triplet (integer, numerator, denominator).")
         else:
             if (not isinstance(max,int)) or max<1:
-                raise ValueError("max must not be less than 1.")
+                raise ValueError("max must be an integer and max must not be less than 1.")
             self.integer=random.randint(0,max)
             self.denominator=random.randint(1,max)
             is_fra=random.randint(1,2)
@@ -128,7 +128,7 @@ class Fraction:
         else:
             raise ValueError("The operator must be one of '+','-' ,'*',or'%'.")
     
-    def caculate_fractions(self):
+    def calculate_fractions(self):
         if self.op=='+':
             denominator=self.f1.denominator*self.f2.denominator
             numerator=(self.f1.integer*self.f1.denominator+self.f1.numerator)*self.f2.denominator\
@@ -280,9 +280,9 @@ class Expression:
                 string=str_sub_1+'|'+str_sub_2+'|'+str_sub_3
         return expression_list,string
 
-    def caculate_answer(self,expression_list):
+    def calculate_answer(self,expression_list):
         expression_1=Fraction(expression_list[0][0],expression_list[0][2],expression_list[0][1])
-        result_1=expression_1.caculate_fractions()
+        result_1=expression_1.calculate_fractions()
         # Check if the result of the first subexpression is less than zero and raise an exception if so.
         if float(result_1)<0:
             raise ValueError("Sub expression cannot be less than zero.")
@@ -293,28 +293,28 @@ class Expression:
                 expression_2=Fraction(result_1,expression_list[1][1],expression_list[1][0])
             else:
                 expression_2=Fraction(expression_list[1][0],result_1,expression_list[1][1])
-            result=expression_2.caculate_fractions()
+            result=expression_2.calculate_fractions()
         else:
             if len(expression_list[2])==1:
                 expression_2=Fraction(expression_list[1][0],expression_list[1][2],expression_list[1][1])
-                result_2=expression_2.caculate_fractions()
+                result_2=expression_2.calculate_fractions()
                 if float(result_2)<0:
                     raise ValueError("Sub expression cannot be less than zero.")
                 expression_3=Fraction(result_1,result_2,expression_list[2][0])
-                result=expression_3.caculate_fractions()
+                result=expression_3.calculate_fractions()
             else:
                 if isinstance(expression_list[1][0],str):
                     expression_2=Fraction(result_1,expression_list[1][1],expression_list[1][0])
                 else:
                     expression_2=Fraction(expression_list[1][0],result_1,expression_list[1][1])
-                result_2=expression_2.caculate_fractions()
+                result_2=expression_2.calculate_fractions()
                 if float(result_2)<0:
                     raise ValueError("Sub expression cannot be less than zero.")
                 if isinstance(expression_list[2][0],str):
                     expression_2=Fraction(result_2,expression_list[2][1],expression_list[2][0])
                 else:
                     expression_2=Fraction(expression_list[2][0],result_2,expression_list[2][1])
-                result=expression_2.caculate_fractions()
+                result=expression_2.calculate_fractions()
         if float(result)<0:
             raise ValueError("Sub expression cannot be less than zero.")
         return result
@@ -324,7 +324,7 @@ class Expression:
             self.generation_times+=1
             try:
                 exp_list,exp_string=self.generate_expression_list()
-                answer=self.caculate_answer(exp_list)
+                answer=self.calculate_answer(exp_list)
             # If an exception (e.g., division by zero) occurs during expression generation or calculation,
             # continue to the next iteration to generate a valid expression.
             except ValueError as e:
