@@ -48,7 +48,6 @@ class MathQuizApp:
         # 创建答题结果显示区域
         self.results_label = tk.Label(root, text="答题结果:")
         self.results_label.pack()
-
         self.results_text = tk.Text(root, height=5, width=40)
         self.results_text.pack()
 
