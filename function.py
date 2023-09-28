@@ -46,7 +46,7 @@ class Number:
                 raise ValueError("nums must be a triplet (integer, numerator, denominator).")
         else:
             if (not isinstance(max,int)) or max<1:
-                raise ValueError("max must not be less than 1.")
+                raise ValueError("max must be an integer and max must not be less than 1.")
             self.integer=random.randint(0,max)
             self.denominator=random.randint(1,max)
             is_fra=random.randint(1,2)
