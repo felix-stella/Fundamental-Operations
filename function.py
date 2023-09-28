@@ -1,6 +1,5 @@
 import random
 import math
-from unittest import result
 
 class Number:
     '''Generate random or predefined numbers for mathematical operations.
