@@ -1,6 +1,7 @@
 import tkinter as tk
 from function import *
 
+
 class MathQuizApp:
     def __init__(self, root):
         self.root = root
@@ -99,6 +100,7 @@ class MathQuizApp:
         self.results_text.delete(1.0, tk.END)
         self.results_text.insert(tk.END, f"正确题号: {', '.join(map(str, correct))}\n")
         self.results_text.insert(tk.END, f"错误题号: {', '.join(map(str, incorrect))}\n")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
